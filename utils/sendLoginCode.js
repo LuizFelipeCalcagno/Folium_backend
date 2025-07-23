@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-module.exports = async function sendLoginCode(to, code) {
+const sendLoginCode = async (to, code) => {
   await transporter.sendMail({
     from: `"Folium" <${process.env.EMAIL_USER}>`,
     to,
@@ -23,4 +23,7 @@ module.exports = async function sendLoginCode(to, code) {
     `
   });
 };
+
+export default sendLoginCode;
+
 

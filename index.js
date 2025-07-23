@@ -8,10 +8,12 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({
-  origin: "https://folium.netlify.app",
-  credentials: true,
-}));
+const corsOptions = {
+  origin: 'https://folium.netlify.app',
+  credentials: true, // necessário se você usa cookies/sessions
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 

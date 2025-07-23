@@ -15,10 +15,10 @@
   "name": "folium_backend",
   "version": "1.0.0",
   "description": "Toda a parte backend do projeto para implementação web via Supabase e Railway",
-  "main": "index.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",

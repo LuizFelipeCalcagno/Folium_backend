@@ -1,4 +1,4 @@
-exports.confirmLogin = (req, res) => {
+export const confirmLogin = (req, res) => {
   const { code } = req.body;
 
   if (!req.session.tempUser) {
@@ -27,4 +27,5 @@ exports.confirmLogin = (req, res) => {
 
   res.send(`Login confirmado! Bem-vindo, ${req.session.user_nome}.`);
 };
+
 

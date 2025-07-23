@@ -1,11 +1,11 @@
-const { createClient } = require('@supabase/supabase-js');
-const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
-const sendLoginCode = require('../utils/sendLoginCode');
+import { createClient } from '@supabase/supabase-js';
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+import sendLoginCode from '../utils/sendLoginCode.js';
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
-exports.loginUser = async (req, res) => {
+export const loginUser = async (req, res) => {
   const { email, password, rememberMe } = req.body;
 
   try {
@@ -24,13 +24,14 @@ exports.loginUser = async (req, res) => {
     // Gera código de 6 dígitos
     const loginCode = crypto.randomInt(100000, 999999).toString();
 
+    // req.session depende do middleware express-session estar configurado
     req.session.tempUser = {
       id: user.id,
       name1: user.name1,
       email,
       code: loginCode,
-      expiresAt: Date.now() + 10 * 60 * 1000, // 10 min
-      rememberMe
+      expiresAt: Date.now() + 10 * 60 * 1000, // 10 minutos
+      rememberMe,
     };
 
     await sendLoginCode(email, loginCode);
@@ -41,3 +42,4 @@ exports.loginUser = async (req, res) => {
     res.status(500).send('Erro interno no servidor.');
   }
 };
+

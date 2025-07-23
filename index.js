@@ -11,7 +11,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // 🟢 Configura o CORS antes das rotas
 app.use(cors({
-  origin: "https://splendid-sfogliatella-b8ee2d.netlify.app", // ✅ Seu domínio do Netlify
+  origin: "https://folium.netlify.app", // ✅ Seu domínio do Netlify
   methods: ["GET", "POST"],
   credentials: true
 }));

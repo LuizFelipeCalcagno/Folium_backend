@@ -14,6 +14,7 @@
   "version": "1.0.0",
   "description": "Toda a parte backend do projeto para implementação web via Supabase e Railway",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node index.js"
   },

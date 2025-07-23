@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -8,7 +8,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-module.exports = async function sendVerificationEmail(email, name, hash) {
+const sendVerificationEmail = async (email, name, hash) => {
   const link = `${process.env.FRONTEND_URL}/verify_email.html?hash=${hash}`;
   await transporter.sendMail({
     from: `"Folium" <${process.env.EMAIL_USER}>`,
@@ -21,3 +21,6 @@ module.exports = async function sendVerificationEmail(email, name, hash) {
     `,
   });
 };
+
+export default sendVerificationEmail;
+

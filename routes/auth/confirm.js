@@ -1,7 +1,11 @@
-const express = require('express');
+import express from 'express';
+import { confirmLogin } from '../../controllers/confirmController.js';
+
 const router = express.Router();
-const { confirmLogin } = require('../../controllers/confirmController');
 
 router.post('/', confirmLogin);
 
-module.exports = router;
+export default router;
+
+
+

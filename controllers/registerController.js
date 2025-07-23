@@ -1,19 +1,11 @@
-const bcrypt = require('bcrypt');
-const { createClient } = require('@supabase/supabase-js');
-const sendVerificationEmail = require('../utils/sendVerificationEmail');
-const cors = require('cors');
+import bcrypt from 'bcrypt';
+import { createClient } from '@supabase/supabase-js';
+import sendVerificationEmail from '../utils/sendVerificationEmail.js';
+import crypto from 'crypto';
 
-// Supabase client
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
-// CORS middleware (libera Netlify)
-const corsOptions = {
-  origin: "https://folium.netlify.app", // frontend no Netlify
-  credentials: true,
-};
-app.use(cors(corsOptions)); // adicione isso no index.js principal do backend
-
-exports.registerUser = async (req, res) => {
+export const registerUser = async (req, res) => {
   const { email, password, confipassword, name } = req.body;
 
   if (!email || !password || !confipassword || !name) {
@@ -25,26 +17,31 @@ exports.registerUser = async (req, res) => {
   }
 
   try {
-    const { data: existingUser } = await supabase
+    const { data: existingUser, error } = await supabase
       .from('usuarios')
       .select('id')
       .eq('email', email)
       .single();
 
-    if (existingUser) {
+    if (!error && existingUser) {
       return res.status(400).json({ message: 'Esse e-mail já está registrado.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const hash = Math.random().toString(36).substring(2, 10).toUpperCase();
+    const hash = crypto.randomBytes(4).toString('hex').toUpperCase();
 
-    await sendVerificationEmail(email, name, hash);
+    try {
+      await sendVerificationEmail(email, name, hash);
+    } catch (emailError) {
+      console.error('Erro ao enviar email:', emailError);
+      return res.status(500).json({ message: 'Erro ao enviar email de verificação.' });
+    }
 
     const { error: insertError } = await supabase
       .from('usuarios')
       .insert([{
         name1: name,
-        email: email,
+        email,
         password: hashedPassword,
         verificado: false,
         hash1: hash,
@@ -55,11 +52,10 @@ exports.registerUser = async (req, res) => {
       return res.status(500).json({ message: 'Erro ao registrar usuário.' });
     }
 
-    return res.status(201).json({
-      message: 'Usuário registrado com sucesso! Verifique seu e-mail para ativar a conta.'
-    });
+    return res.status(201).json({ message: 'Usuário registrado com sucesso! Verifique seu e-mail para ativar a conta.' });
   } catch (err) {
     console.error('Erro no servidor:', err);
     return res.status(500).json({ message: 'Erro no servidor.' });
   }
 };
+

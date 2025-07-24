@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 
 import registerRouter from './routes/auth/register.js';
-import verifyRouter from './routes/auth/verify.js'; // caminho do arquivo da rota verify
+import verifyRouter from './routes/auth/verify.js'; 
 import loginRouter from './routes/auth/login.js';
 import confirmRouter from './routes/auth/confirm.js';
 

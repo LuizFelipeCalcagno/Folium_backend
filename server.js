@@ -41,32 +41,25 @@ app.use(session({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Função auxiliar para registrar rota e logar com validação
-function registerRoute(path, router) {
-  if (typeof path !== 'string' || !path.startsWith('/')) {
-    console.error('ERRO: path inválido passado para app.use:', path);
-  } else {
-    console.log(`Registrando rota: ${path}`);
-    app.use(path, router);
-  }
-}
-
 // Registra as rotas
 registerRoute('/auth', authRouter);
 
-// Agora que as rotas estão registradas, lista elas:
-console.log('Rotas registradas no Express:');
 app._router.stack.forEach((layer) => {
-  if (layer.route) {
+  if (layer.route && layer.route.path) {
     console.log('Rota:', layer.route.path);
   } else if (layer.name === 'router' && layer.handle.stack) {
     layer.handle.stack.forEach((handler) => {
-      if (handler.route) {
+      if (handler.route && handler.route.path) {
         console.log('Sub-rota:', handler.route.path);
+      } else if (handler.name === 'router' && handler.handle.stack) {
+        handler.handle.stack.forEach((subhandler) => {
+          console.log('Sub-sub-rota:', subhandler.route?.path);
+        });
       }
     });
   }
 });
+
 
 // Start do servidor
 app.listen(PORT, () => {

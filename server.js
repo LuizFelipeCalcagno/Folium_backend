@@ -5,6 +5,8 @@ import cookieParser from 'cookie-parser';
 
 import registerRouter from './routes/auth/register.js';
 import verifyRouter from './routes/auth/verify.js'; // caminho do arquivo da rota verify
+import loginRouter from './routes/auth/login.js';
+import confirmRouter from './routes/auth/confirm.js';
 
 dotenv.config();
 
@@ -19,6 +21,8 @@ app.use(cookieParser());
 
 app.use('/api/auth/register', registerRouter);
 app.use('/api/auth/verify', verifyRouter);
+app.use('/api/auth/login', loginRouter);
+app.use('/api/auth/confirm', confirmRouter);
 
 app.listen(3000, () => {
   console.log('Servidor rodando em http://localhost:3000');

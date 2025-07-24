@@ -41,10 +41,14 @@ app.use(session({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Função auxiliar para registrar rota e logar
+// Função auxiliar para registrar rota e logar com validação
 function registerRoute(path, router) {
-  console.log(`Registrando rota: ${path}`);
-  app.use(path, router);
+  if (typeof path !== 'string' || !path.startsWith('/')) {
+    console.error('ERRO: path inválido passado para app.use:', path);
+  } else {
+    console.log(`Registrando rota: ${path}`);
+    app.use(path, router);
+  }
 }
 
 // Rotas - aqui o primeiro parâmetro deve ser a rota (path), não arquivo

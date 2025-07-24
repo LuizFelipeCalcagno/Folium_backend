@@ -11,28 +11,18 @@ dotenv.config();
 console.log('FRONTEND_URL:', process.env.FRONTEND_URL);
 console.log('SESSION_SECRET:', process.env.SESSION_SECRET);
 
-app._router.stack.forEach((layer) => {
-  if (layer.route) {
-    console.log('Rota registrada:', layer.route.path);
-  } else if (layer.name === 'router') {
-    layer.handle.stack.forEach((handler) => {
-      console.log('Rota registrada no sub-router:', handler.route?.path);
-    });
-  }
-});
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Configuração CORS
 app.use(cors({
-  origin: process.env.FRONTEND_URL,  // ex: 'https://folium.netlify.app'
+  origin: process.env.FRONTEND_URL,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 }));
 
-app.options('*', cors()); // Habilita preflight OPTIONS
+app.options('*', cors());
 
 // Middlewares
 app.use(cookieParser());
@@ -61,10 +51,25 @@ function registerRoute(path, router) {
   }
 }
 
-// Rotas - aqui o primeiro parâmetro deve ser a rota (path), não arquivo
+// Registra as rotas
 registerRoute('/auth', authRouter);
+
+// Agora que as rotas estão registradas, lista elas:
+console.log('Rotas registradas no Express:');
+app._router.stack.forEach((layer) => {
+  if (layer.route) {
+    console.log('Rota:', layer.route.path);
+  } else if (layer.name === 'router' && layer.handle.stack) {
+    layer.handle.stack.forEach((handler) => {
+      if (handler.route) {
+        console.log('Sub-rota:', handler.route.path);
+      }
+    });
+  }
+});
 
 // Start do servidor
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
+

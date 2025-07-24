@@ -1,9 +1,10 @@
 import express from 'express';
-import { registerUser } from '../../controllers/registerController.js';
-
 const router = express.Router();
 
-router.post('/', registerUser);
+router.post('/', async (req, res) => {
+  // lógica de registro
+  res.json({ ok: true });
+});
 
 export default router;
 

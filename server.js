@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 3000;
 
 // Configuração CORS
 app.use(cors({
-  origin: process.env.FRONTEND_URL,  // exemplo: 'https://folium.netlify.app'
+  origin: process.env.FRONTEND_URL,  // ex: 'https://folium.netlify.app'
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
@@ -27,30 +27,35 @@ app.options('*', cors()); // Habilita preflight OPTIONS
 
 // Middlewares
 app.use(cookieParser());
-app.set('trust proxy', 1); // se estiver atrás de proxy (ex: Railway, Heroku)
+app.set('trust proxy', 1);
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // true em produção (HTTPS), false local
-    sameSite: 'none', // para permitir cookies cross-site
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'none',
   },
 }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rotas
-app.use('./api/auth/login.js', loginRoutes);
-app.use('./api/auth/confirm.js', confirmRoutes);
-app.use('./api/auth/logout.js', logoutRoutes);
-app.use('./api/auth/register.js', registerRoutes);
-app.use('./authl.js', authRouter);
+// Função auxiliar para registrar rota e logar
+function registerRoute(path, router) {
+  console.log(`Registrando rota: ${path}`);
+  app.use(path, router);
+}
+
+// Rotas - aqui o primeiro parâmetro deve ser a rota (path), não arquivo
+registerRoute('/api/auth/login', loginRoutes);
+registerRoute('/api/auth/confirm', confirmRoutes);
+registerRoute('/api/auth/logout', logoutRoutes);
+registerRoute('/api/auth/register', registerRoutes);
+registerRoute('/auth', authRouter);
 
 // Start do servidor
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
-

@@ -43,11 +43,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Rotas
-app.use('/api/auth/login', loginRoutes);
-app.use('/api/auth/confirm', confirmRoutes);
-app.use('/api/auth/logout', logoutRoutes);
-app.use('/api/auth/register', registerRoutes);
-app.use('/auth', authRouter);
+app.use('./api/auth/login.js', loginRoutes);
+app.use('./api/auth/confirm.js', confirmRoutes);
+app.use('./api/auth/logout.js', logoutRoutes);
+app.use('./api/auth/register.js', registerRoutes);
+app.use('./authl.js', authRouter);
 
 // Start do servidor
 app.listen(PORT, () => {

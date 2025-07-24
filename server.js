@@ -1,35 +1,56 @@
-const BACKEND_URL = 'https://foliumbackend-production.up.railway.app';
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import dotenv from 'dotenv';
 
-async function postData(endpoint, data) {
-  const response = await fetch(`${BACKEND_URL}${endpoint}`, {
-    method: 'POST',
-    credentials: 'include', // para cookies/session
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
+import authRouter from './routes/auth/auths.js';
+import loginRoutes from './routes/auth/login.js';
+import confirmRoutes from './routes/auth/confirm.js';
+import logoutRoutes from './routes/auth/logout.js';
+import registerRoutes from './routes/auth/register.js';
 
-  const json = await response.json();
+dotenv.config();
 
-  if (!response.ok) {
-    throw new Error(json.error || json.message || 'Erro desconhecido');
-  }
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-  return json;
-}
+// Configuração CORS
+app.use(cors({
+  origin: process.env.FRONTEND_URL,  // exemplo: 'https://folium.netlify.app'
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+}));
 
-export async function login(email, password, rememberMe) {
-  return postData('/api/auth/login', { email, password, rememberMe });
-}
+app.options('*', cors()); // Habilita preflight OPTIONS
 
-export async function confirmCode(code) {
-  return postData('/api/auth/confirm', { code });
-}
+// Middlewares
+app.use(cookieParser());
+app.set('trust proxy', 1); // se estiver atrás de proxy (ex: Railway, Heroku)
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // true em produção (HTTPS), false local
+    sameSite: 'none', // para permitir cookies cross-site
+  },
+}));
 
-export async function logout() {
-  return postData('/api/auth/logout', {});
-}
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-export async function register(name, email, password, confipassword) {
-  return postData('/api/auth/register', { name, email, password, confipassword });
-}
+// Rotas
+app.use('/api/auth/login', loginRoutes);
+app.use('/api/auth/confirm', confirmRoutes);
+app.use('/api/auth/logout', logoutRoutes);
+app.use('/api/auth/register', registerRoutes);
+app.use('/auth', authRouter);
+
+// Start do servidor
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
 

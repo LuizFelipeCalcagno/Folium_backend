@@ -5,15 +5,15 @@ const transporter = nodemailer.createTransport({
   port: Number(process.env.EMAIL_PORT),
   secure: Number(process.env.EMAIL_PORT) === 465, // true para porta 465, false para outras
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS,
   },
 });
 
 const sendLoginCode = async (to, code) => {
   try {
     await transporter.sendMail({
-      from: `"Folium" <${process.env.EMAIL_USER}>`,
+      from: `"Folium" <${process.env.GMAIL_USER}>`,
       to,
       subject: "Confirmação de Login",
       html: `

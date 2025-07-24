@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api/auth/register', registerRouter);
-app.use('/api/auth', verifyRouter);
+app.use('/api/auth/verify', verifyRouter);
 
 app.listen(3000, () => {
   console.log('Servidor rodando em http://localhost:3000');

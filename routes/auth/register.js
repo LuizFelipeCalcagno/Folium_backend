@@ -1,12 +1,9 @@
 // routes/auth/register.js
 import express from 'express';
+import { registerUser } from '../../controllers/registerController.js'; // ajuste conforme onde seu controller está
+
 const router = express.Router();
 
-router.post('/', (req, res) => {
-  const { email, password, confipassword, name } = req.body;
-
-  // Aqui você pode fazer validações ou salvar no banco
-  res.status(201).json({ message: 'Usuário registrado com sucesso!' });
-});
+router.post('/', registerUser);
 
 export default router;

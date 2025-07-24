@@ -1,4 +1,4 @@
-const BACKEND_URL = https://foliumbackend-production.up.railway.app;
+const BACKEND_URL = 'https://foliumbackend-production.up.railway.app';
 
 async function postData(endpoint, data) {
   const response = await fetch(`${BACKEND_URL}${endpoint}`, {

@@ -41,9 +41,20 @@ app.use(session({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Função para registrar rota com log
+function registerRoute(path, router) {
+  if (typeof path !== 'string' || !path.startsWith('/')) {
+    console.error('ERRO: path inválido passado para app.use:', path);
+  } else {
+    console.log(`Registrando rota: ${path}`);
+    app.use(path, router);
+  }
+}
+
 // Registra as rotas
 registerRoute('/auth', authRouter);
 
+// Log de rotas registradas — coloque isso *depois* do registro das rotas
 app._router.stack.forEach((layer) => {
   if (layer.route && layer.route.path) {
     console.log('Rota:', layer.route.path);
@@ -60,9 +71,9 @@ app._router.stack.forEach((layer) => {
   }
 });
 
-
 // Start do servidor
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
+
 

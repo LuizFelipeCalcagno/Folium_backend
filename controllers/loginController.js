@@ -8,6 +8,10 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
 export const loginUser = async (req, res) => {
   const { email, password, rememberMe } = req.body;
 
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email e senha são obrigatórios.' });
+  }
+
   try {
     const { data: user, error } = await supabase
       .from('usuarios')
@@ -15,16 +19,26 @@ export const loginUser = async (req, res) => {
       .eq('email', email)
       .single();
 
-    if (error || !user) return res.status(401).send('Email ou senha incorretos.');
-    if (!user.verificado) return res.status(403).send('Conta não verificada.');
+    if (error) {
+      console.error('Erro Supabase:', error);
+      return res.status(500).json({ error: 'Erro no banco de dados.' });
+    }
+    if (!user) {
+      return res.status(401).json({ error: 'Email ou senha incorretos.' });
+    }
+
+    if (!user.verificado) {
+      return res.status(403).json({ error: 'Conta não verificada.' });
+    }
 
     const passwordValid = await bcrypt.compare(password, user.password);
-    if (!passwordValid) return res.status(401).send('Email ou senha incorretos.');
+    if (!passwordValid) {
+      return res.status(401).json({ error: 'Email ou senha incorretos.' });
+    }
 
     // Gera código de 6 dígitos
     const loginCode = crypto.randomInt(100000, 999999).toString();
 
-    // req.session depende do middleware express-session estar configurado
     req.session.tempUser = {
       id: user.id,
       name1: user.name1,
@@ -36,10 +50,11 @@ export const loginUser = async (req, res) => {
 
     await sendLoginCode(email, loginCode);
 
-    res.send('Código de confirmação enviado para seu e-mail.');
+    return res.json({ message: 'Código de confirmação enviado para seu e-mail.' });
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Erro interno no servidor.');
+    console.error('Erro interno:', err);
+    return res.status(500).json({ error: 'Erro interno no servidor.' });
   }
 };
+
 

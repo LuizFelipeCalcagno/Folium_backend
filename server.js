@@ -49,11 +49,7 @@ function registerRoute(path, router) {
 }
 
 // Rotas - aqui o primeiro parâmetro deve ser a rota (path), não arquivo
-//registerRoute('/api/auth/login', loginRoutes);
-//registerRoute('/api/auth/confirm', confirmRoutes);
-//registerRoute('/api/auth/logout', logoutRoutes);
-//registerRoute('/api/auth/register', registerRoutes);
-//registerRoute('/auth', authRouter);
+registerRoute('/auth', authRouter);
 
 // Start do servidor
 app.listen(PORT, () => {

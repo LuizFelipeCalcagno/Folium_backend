@@ -11,6 +11,16 @@ dotenv.config();
 console.log('FRONTEND_URL:', process.env.FRONTEND_URL);
 console.log('SESSION_SECRET:', process.env.SESSION_SECRET);
 
+app._router.stack.forEach((layer) => {
+  if (layer.route) {
+    console.log('Rota registrada:', layer.route.path);
+  } else if (layer.name === 'router') {
+    layer.handle.stack.forEach((handler) => {
+      console.log('Rota registrada no sub-router:', handler.route?.path);
+    });
+  }
+});
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 

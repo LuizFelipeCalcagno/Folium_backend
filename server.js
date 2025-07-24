@@ -15,23 +15,6 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-
-console.log('ROTA LOGIN:', '/api/auth/login', loginRoutes);
-app.use('/api/auth/login', loginRoutes);
-
-console.log('ROTA CONFIRM:', '/api/auth/confirm', confirmRoutes);
-app.use('/api/auth/confirm', confirmRoutes);
-
-console.log('ROTA LOGOUT:', '/api/auth/logout', logoutRoutes);
-app.use('/api/auth/logout', logoutRoutes);
-
-console.log('ROTA REGISTER:', '/api/auth/register', registerRoutes);
-app.use('/api/auth/register', registerRoutes);
-
-console.log('ROTA AUTH:', '/auth', authRouter);
-app.use('/auth', authRouter);
-
-
 // Configuração CORS
 app.use(cors({
   origin: process.env.FRONTEND_URL,  // ex: 'https://folium.netlify.app'
@@ -67,10 +50,10 @@ function registerRoute(path, router) {
 
 // Rotas - aqui o primeiro parâmetro deve ser a rota (path), não arquivo
 registerRoute('/api/auth/login', loginRoutes);
-registerRoute('/api/auth/confirm', confirmRoutes);
-registerRoute('/api/auth/logout', logoutRoutes);
-registerRoute('/api/auth/register', registerRoutes);
-registerRoute('/auth', authRouter);
+//registerRoute('/api/auth/confirm', confirmRoutes);
+//registerRoute('/api/auth/logout', logoutRoutes);
+//registerRoute('/api/auth/register', registerRoutes);
+//registerRoute('/auth', authRouter);
 
 // Start do servidor
 app.listen(PORT, () => {

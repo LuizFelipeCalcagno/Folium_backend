@@ -3,8 +3,8 @@ import nodemailer from 'nodemailer';
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS,
   },
 });
 
@@ -22,7 +22,7 @@ const sendVerificationEmail = async (email, name, hash) => {
   const link = `${process.env.FRONTEND_URL}/verify_email.html?hash=${hash}`;
   try {
     await transporter.sendMail({
-      from: `"Folium" <${process.env.EMAIL_USER}>`,
+      from: `"Folium" <${process.env.GMAIL_USER}>`,
       to: email,
       subject: 'Verifique seu e-mail para confirmar sua conta',
       html: `

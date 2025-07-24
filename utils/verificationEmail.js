@@ -19,7 +19,7 @@ const escapeHtml = (unsafe) => {
 
 const sendVerificationEmail = async (email, name, hash) => {
   const safeName = escapeHtml(name);
-  const link = `${process.env.FRONTEND_URL}/verify_email.html?hash=${hash}`;
+  const link = `${process.env.FRONTEND_URL}/verificar/${hash}`;
   try {
     await transporter.sendMail({
       from: `"Folium" <${process.env.GMAIL_USER}>`,

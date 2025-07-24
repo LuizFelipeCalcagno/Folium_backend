@@ -1,40 +1,40 @@
+// routes/auth/verify.js
 import express from 'express';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-
 const router = express.Router();
 
-router.get('/verify', async (req, res) => {
-  const { hash } = req.query;
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
-  if (!hash) {
-    return res.status(400).send('Código de verificação inválido.');
-  }
+router.get('/:hash', async (req, res) => {
+  const { hash } = req.params;
 
-  // Busca usuário pelo hash
   const { data: user, error } = await supabase
     .from('usuarios')
     .select('*')
-    .eq('hash1', hash)
+    .eq('hash_verificacao', hash)
     .single();
 
   if (error || !user) {
-    return res.status(400).send('Código de verificação inválido ou expirado.');
+    return res.status(400).send('<h2>Link inválido ou expirado.</h2>');
   }
 
-  // Atualiza usuário para verificado
+  if (user.verificado) {
+    return res.send('<h2>Conta já verificada.</h2>');
+  }
+
   const { error: updateError } = await supabase
     .from('usuarios')
-    .update({ verificado: true, hash1: null }) // opcional: remove o hash para não permitir reuso
+    .update({ verificado: true, hash_verificacao: null }) // remove hash
     .eq('id', user.id);
 
   if (updateError) {
-    return res.status(500).send('Erro ao confirmar o e-mail.');
+    console.error(updateError);
+    return res.status(500).send('<h2>Erro ao verificar sua conta.</h2>');
   }
 
-  // Pode redirecionar para uma página de sucesso no frontend
-  res.redirect(`${process.env.FRONTEND_URL}/email_confirmed.html`);
+  res.send(`<h2>Conta verificada com sucesso! Você já pode fazer login.</h2>`);
 });
 
 export default router;
+

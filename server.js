@@ -1,20 +1,24 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 
-import registerRoute from './routes/auth/register.js';
+import registerRouter from './routes/auth/register.js';
 
 dotenv.config();
+
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
+}));
 app.use(express.json());
+app.use(cookieParser());
 
-// Aqui registramos a rota corretamente
-app.use('/api/auth/register', registerRoute);
+app.use('/routes/auth/register.js', registerRouter);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+app.listen(3000, () => {
+  console.log('Servidor rodando em http://localhost:3000');
 });
 

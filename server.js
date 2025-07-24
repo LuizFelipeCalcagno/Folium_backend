@@ -10,14 +10,15 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+  origin: process.env.FRONTEND_URL,
   credentials: true,
 }));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use('/api/auth/register', registerRouter);
+app.use('/api/auth/register.js', registerRouter);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+app.listen(3000, () => {
+  console.log('Servidor rodando em http://localhost:3000');
+});
 

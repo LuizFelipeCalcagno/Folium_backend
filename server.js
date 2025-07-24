@@ -5,12 +5,11 @@ import session from 'express-session';
 import dotenv from 'dotenv';
 
 import authRouter from './routes/auth/auths.js';
-import loginRoutes from './routes/auth/login.js';
-import confirmRoutes from './routes/auth/confirm.js';
-import logoutRoutes from './routes/auth/logout.js';
-import registerRoutes from './routes/auth/register.js';
 
 dotenv.config();
+
+console.log('FRONTEND_URL:', process.env.FRONTEND_URL);
+console.log('SESSION_SECRET:', process.env.SESSION_SECRET);
 
 const app = express();
 const PORT = process.env.PORT || 3000;

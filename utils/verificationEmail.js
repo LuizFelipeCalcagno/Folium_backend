@@ -17,11 +17,6 @@ const escapeHtml = (unsafe) => {
     .replace(/'/g, "&#039;");
 };
 
-
-  console.log('Enviando email para:', email);
-  console.log('Link:', link);
-  console.log('Usuário SMTP:', process.env.GMAIL_USER);
-
 const sendVerificationEmail = async (email, name, hash) => {
   const safeName = escapeHtml(name);
   const link = `${process.env.FRONTEND_URL}/verify_email.html?hash=${hash}`;

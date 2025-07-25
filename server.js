@@ -18,7 +18,7 @@ const PgSession = pgSession(session);
 const app = express();
 
 const pgPool = new pg.Pool({
-  connectionString: process.env.SUPABASE_URL, // sua URL do PostgreSQL (Railway ou Supabase)
+  connectionString: process.env.SUPABASE_URL,
   ssl: {
     rejectUnauthorized: false, // necessário se for Railway com SSL
   },

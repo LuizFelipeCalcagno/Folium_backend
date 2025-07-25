@@ -1,98 +1,44 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <title>E-mail Confirmado</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+// routes/auth/verify.js
+import express from 'express';
+import { createClient } from '@supabase/supabase-js';
 
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #4b33a8, #9f73ff);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: #333;
-    }
+const router = express.Router();
 
-    .container {
-      background-color: #fff;
-      border-radius: 20px;
-      padding: 40px 50px;
-      box-shadow: 0 8px 20px rgb(0 0 0 / 0.15);
-      max-width: 420px;
-      width: 90%;
-      text-align: center;
-      display: none;
-    }
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
-    .container.active {
-      display: block;
-    }
+router.get('/:hash', async (req, res) => {
+  const { hash } = req.params;
 
-    .container h1 {
-      color: #5c2ee2;
-      font-weight: 700;
-      font-size: 2.4rem;
-      margin-bottom: 16px;
-    }
+  const { data: user, error } = await supabase
+    .from('usuarios')
+    .select('*')
+    .eq('hash1', hash)
+    .single();
 
-    .container p {
-      font-size: 1.1rem;
-      margin-bottom: 30px;
-      color: #333;
-    }
+  if (error || !user) {
+    return res.status(400).json({ success: false, message: 'Link inválido ou expirado.' });
+  }
 
-    button {
-      background-color: #5c2ee2;
-      border: none;
-      border-radius: 8px;
-      padding: 14px 30px;
-      font-weight: 700;
-      font-size: 1rem;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      box-shadow: 0 4px 10px rgb(92 46 226 / 0.5);
-    }
+  if (user.verificado) {
+    return res.status(200).json({ success: true, message: 'Conta já estava verificada.' });
+  }
 
-    button:hover {
-      background-color: #4823b2;
-      box-shadow: 0 6px 15px rgb(72 35 178 / 0.7);
-    }
-  </style>
-</head>
-<body>
-  <div class="container" id="success">
-    <h1>✅ E-mail Confirmado!</h1>
-    <p>Obrigado por confirmar seu endereço de e-mail. Sua conta agora está ativada.</p>
-    <button onclick="window.location.href='index.html'">Ir para Login</button>
-  </div>
+  const { error: updateError } = await supabase
+    .from('usuarios')
+    .update({ verificado: true, hash1: null })
+    .eq('id', user.id);
 
-  <div class="container" id="error">
-    <h1>❌ Erro ao confirmar</h1>
-    <p>Não foi possível confirmar sua conta. O link pode estar expirado ou inválido.</p>
-    <button onclick="window.location.href='index.html'">Voltar</button>
-  </div>
+  if (updateError) {
+    console.error(updateError);
+    return res.status(500).json({ success: false, message: 'Erro ao verificar sua conta.' });
+  }
 
-  <script>
-    const success = document.getElementById("success");
-    const error = document.getElementById("error");
-    const hash = window.location.pathname.split('/').pop();
+  res.status(200).json({ success: true, message: 'Conta verificada com sucesso!' });
+});
 
-    fetch(`https://foliumbackend-production.up.railway.app/api/auth/verify/${hash}`)
-      .then(res => {
-        if (!res.ok) throw new Error('Erro na verificação');
-        return res.text();
-      })
-      .then(() => {
-        success.classList.add('active');
-      })
-      .catch(() => {
-        error.classList.add('active');
-      });
-  </script>
-</body>
-</html>
+export default router;
+
+

@@ -3,6 +3,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
+import pgSession from 'connect-pg-simple';
+import pg from 'pg';
+
 
 import registerRouter from './routes/auth/register.js';
 import verifyRouter from './routes/auth/verify.js';
@@ -11,7 +14,15 @@ import confirmRouter from './routes/auth/confirm.js';
 
 dotenv.config();
 
+const PgSession = pgSession(session);
 const app = express();
+
+const pgPool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL, // sua URL do PostgreSQL (Railway ou Supabase)
+  ssl: {
+    rejectUnauthorized: false, // necessário se for Railway com SSL
+  },
+});
 
 // CORS com credenciais e origem liberada para o frontend hospedado
 app.use(cors({
@@ -25,14 +36,18 @@ app.use(cookieParser());
 
 // Sessão configurada para ambientes cross-domain (Netlify + Railway)
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'uma-chave-secreta-super-segura',
+  store: new PgSession({
+    pool: pgPool, // sua conexão com PostgreSQL
+    tableName: 'user_sessions', // nome da tabela que vai armazenar as sessões
+  }),
+  secret: process.env.SESSION_SECRET || 'uma-chave-super-secreta',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 dias
+    maxAge: 10 * 60 * 1000, // 10 minutos ou o tempo que quiser
     httpOnly: true,
-    secure: true,                    // ⚠️ importante: Railway precisa de HTTPS
-    sameSite: 'none',                // ⚠️ necessário para Netlify + Railway funcionarem juntos
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   }
 }));
 

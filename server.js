@@ -3,6 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
+import pg from 'pg';
+import connectPgSimple from 'connect-pg-simple';
 
 import registerRouter from './routes/auth/register.js';
 import verifyRouter from './routes/auth/verify.js'; 
@@ -21,15 +23,26 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-// Configuração da sessão
+// Configuração do PostgreSQL para sessão
+const PgSession = connectPgSimple(session);
+const pgPool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+});
+
 app.use(session({
+  store: new PgSession({
+    pool: pgPool,          // pool do pg
+    tableName: 'session',  // tabela para armazenar sessões
+    createTableIfMissing: true, // cria tabela automaticamente se não existir
+  }),
   secret: process.env.SESSION_SECRET || 'uma-chave-secreta-super-segura',
   resave: false,
   saveUninitialized: false,
   cookie: {
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 dias
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // true em produção (https)
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
   },
 }));
@@ -44,5 +57,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
-
-

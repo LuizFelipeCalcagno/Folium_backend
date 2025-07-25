@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
+import session from 'express-session';
 
 import registerRouter from './routes/auth/register.js';
 import verifyRouter from './routes/auth/verify.js';
@@ -23,6 +24,18 @@ app.use(express.json());
 
 // Parse de cookies (se for usar sessão depois)
 app.use(cookieParser());
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'uma-chave-secreta-super-segura',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 dias
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+  }
+}));
 
 // Rotas
 app.use('/api/auth/register', registerRouter);

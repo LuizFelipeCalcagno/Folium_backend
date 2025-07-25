@@ -21,19 +21,6 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-// Configuração da sessão
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'uma-chave-secreta-super-segura',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 dias
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // true em produção (https)
-    sameSite: 'lax',
-  },
-}));
-
 // Rotas
 app.use('/api/auth/register', registerRouter);
 app.use('/api/auth/verify', verifyRouter);

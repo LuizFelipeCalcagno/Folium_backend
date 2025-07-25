@@ -13,18 +13,17 @@ dotenv.config();
 
 const app = express();
 
-// Configuração do CORS para aceitar o frontend com credenciais
+// CORS com credenciais e origem liberada para o frontend hospedado
 app.use(cors({
-  origin: process.env.FRONTEND_URL,  // ex: 'https://folium.netlify.app'
+  origin: process.env.FRONTEND_URL, // ex: 'https://folium.netlify.app'
   credentials: true,
 }));
 
-// Parse do corpo da requisição como JSON
+// Body parser e cookie parser
 app.use(express.json());
-
-// Parse de cookies (se for usar sessão depois)
 app.use(cookieParser());
 
+// Sessão configurada para ambientes cross-domain (Netlify + Railway)
 app.use(session({
   secret: process.env.SESSION_SECRET || 'uma-chave-secreta-super-segura',
   resave: false,
@@ -32,23 +31,22 @@ app.use(session({
   cookie: {
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 dias
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: true,                    // ⚠️ importante: Railway precisa de HTTPS
+    sameSite: 'none',                // ⚠️ necessário para Netlify + Railway funcionarem juntos
   }
 }));
 
-// Rotas
+// Rotas da API
 app.use('/api/auth/register', registerRouter);
 app.use('/api/auth/verify', verifyRouter);
 app.use('/api/auth/login', loginRouter);
 app.use('/api/auth/confirm', confirmRouter);
 
-// Rota de teste simples para garantir que o servidor está rodando
+// Teste rápido
 app.get('/ping', (req, res) => res.send('pong'));
 
-// Porta
+// Inicia o servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
-

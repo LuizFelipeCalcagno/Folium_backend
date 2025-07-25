@@ -11,7 +11,7 @@ const supabase = createClient(
 
 router.get('/:hash', async (req, res) => {
   const { hash } = req.params;
-
+    console.log('Hash recebido:', hash);
   const { data: user, error } = await supabase
     .from('usuarios')
     .select('*')

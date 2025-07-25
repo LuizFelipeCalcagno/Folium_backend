@@ -9,9 +9,15 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-router.get('/:hash', async (req, res) => {
-  const { hash } = req.params;
-    console.log('Hash recebido:', hash);
+// Agora a rota é só /api/auth/verify, hash vem via query string
+router.get('/', async (req, res) => {
+  const { hash } = req.query;
+  console.log('Hash recebido via query:', hash);
+
+  if (!hash) {
+    return res.status(400).json({ success: false, message: 'Hash não fornecido.' });
+  }
+
   const { data: user, error } = await supabase
     .from('usuarios')
     .select('*')
@@ -40,5 +46,6 @@ router.get('/:hash', async (req, res) => {
 });
 
 export default router;
+
 
 

@@ -2,11 +2,14 @@ import { error } from "console";
 
 export const confirmLogin = (req, res) => {
   try {
+    console.log('ConfirmLogin req.body:', req.body);
+
     const { code } = req.body;
 
     if (!req.session.tempUser) {
       return res.status(400).json({ error: 'Nenhuma tentativa de login pendente.' });
     }
+
 
     const { tempUser } = req.session;
 

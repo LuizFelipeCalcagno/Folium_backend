@@ -14,7 +14,7 @@ import confirmRouter from './routes/auth/confirm.js';
 
 dotenv.config();
 
-const PgSession = pgSession(session);
+const PGStore = pgSession(session);
 const app = express();
 
 const pgPool = new pg.Pool({
@@ -36,18 +36,17 @@ app.use(cookieParser());
 
 // Sessão configurada para ambientes cross-domain (Netlify + Railway)
 app.use(session({
-  store: new PgSession({
-    pool: pgPool, // sua conexão com PostgreSQL
-    tableName: 'user_sessions', // nome da tabela que vai armazenar as sessões
+  store: new PGStore({
+    conString: process.env.DATABASE_URL, // deve estar correta
+    createTableIfMissing: true
   }),
-  secret: process.env.SESSION_SECRET || 'uma-chave-super-secreta',
+  secret: process.env.SESSION_SECRET || 'segredo-super-seguro',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    maxAge: 10 * 60 * 1000, // 10 minutos ou o tempo que quiser
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    sameSite: 'none', // necessário para cross-domain
+    secure: true,     // necessário com HTTPS (Netlify usa)
+    httpOnly: true
   }
 }));
 

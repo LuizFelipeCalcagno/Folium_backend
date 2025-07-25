@@ -18,7 +18,7 @@ const PgSession = pgSession(session);
 const app = express();
 
 const pgPool = new pg.Pool({
-  connectionString: process.env.SUPABASE_URL,
+  connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false, // necessário se for Railway com SSL
   },

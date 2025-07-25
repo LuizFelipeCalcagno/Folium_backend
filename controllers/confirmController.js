@@ -3,18 +3,18 @@ export const confirmLogin = (req, res) => {
     const { code } = req.body;
 
     if (!req.session.tempUser) {
-      return res.status(400).json({ error: 'Nenhuma tentativa de login pendente.' });
+      return res.status(400).json({ message: 'Nenhuma tentativa de login pendente.' });
     }
 
     const { tempUser } = req.session;
 
     if (Date.now() > tempUser.expiresAt) {
       delete req.session.tempUser;
-      return res.status(400).json({ error: 'Código expirado. Faça login novamente.' });
+      return res.status(400).json({ message: 'Código expirado. Faça login novamente.' });
     }
 
     if (String(code) !== String(tempUser.code)) {
-      return res.status(401).json({ error: 'Código incorreto.' });
+      return res.status(401).json({ message: 'Código incorreto.' });
     }
 
     req.session.user_id = tempUser.id;
@@ -31,9 +31,10 @@ export const confirmLogin = (req, res) => {
     return res.json({ message: `Login confirmado! Bem-vindo, ${req.session.user_nome}.` });
   } catch (error) {
     console.error('Erro em confirmLogin:', error);
-    return res.status(500).json({ error: 'Erro interno no servidor.' });
+    return res.status(500).json({ message: 'Erro interno no servidor.' });
   }
 };
+
 
 
 

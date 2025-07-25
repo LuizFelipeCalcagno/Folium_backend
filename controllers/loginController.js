@@ -9,7 +9,7 @@ export const loginUser = async (req, res) => {
   const { email, password, rememberMe } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ error: 'Email e senha são obrigatórios.' });
+    return res.status(400).json({ message: 'Email e senha são obrigatórios.' });
   }
 
   try {
@@ -21,24 +21,25 @@ export const loginUser = async (req, res) => {
 
     if (error) {
       console.error('Erro Supabase:', error);
-      return res.status(500).json({ error: 'Erro no banco de dados.' });
+      return res.status(500).json({ message: 'Erro no banco de dados.' });
     }
     if (!user) {
-      return res.status(401).json({ error: 'Email ou senha incorretos.' });
+      return res.status(401).json({ message: 'Email ou senha incorretos.' });
     }
 
     if (!user.verificado) {
-      return res.status(403).json({ error: 'Conta não verificada.' });
+      return res.status(403).json({ message: 'Conta não verificada.' });
     }
 
     const passwordValid = await bcrypt.compare(password, user.password);
     if (!passwordValid) {
-      return res.status(401).json({ error: 'Email ou senha incorretos.' });
+      return res.status(401).json({ message: 'Email ou senha incorretos.' });
     }
 
     // Gera código de 6 dígitos
     const loginCode = crypto.randomInt(100000, 999999).toString();
 
+    // Armazena na sessão temporária
     req.session.tempUser = {
       id: user.id,
       name1: user.name1,
@@ -53,8 +54,6 @@ export const loginUser = async (req, res) => {
     return res.json({ message: 'Código de confirmação enviado para seu e-mail.' });
   } catch (err) {
     console.error('Erro interno:', err);
-    return res.status(500).json({ error: 'Erro interno no servidor.' });
+    return res.status(500).json({ message: 'Erro interno no servidor.' });
   }
 };
-
-

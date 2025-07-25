@@ -18,12 +18,6 @@ app.use(cors({
   credentials: true,
 }));
 
-// Responde a requisições OPTIONS para todos os endpoints (preflight)
-app.options('*', cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true,
-}));
-
 // Parse do corpo da requisição como JSON
 app.use(express.json());
 
